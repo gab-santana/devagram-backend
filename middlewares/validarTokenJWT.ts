@@ -3,10 +3,9 @@ import type { RespostaPadraoMsg } from "../types/RespostaPadraoMsg";
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
 export const validarTokenJWT = (handler: NextApiHandler) =>
-  (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg| any[]>) => {
+  (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any[]>) => {
 
     try {
-
       const { MINHA_CHAVE_JWT } = process.env
       if (!MINHA_CHAVE_JWT) {
         return res.status(500).json({ erro: 'ENV de chave JWT não informada na execução do projeto' })
@@ -34,7 +33,7 @@ export const validarTokenJWT = (handler: NextApiHandler) =>
           return res.status(401).json({ erro: 'Não foi possivel validar o token de acesso' })
         }
 
-        if (req.query) {
+        if (!req.query) {
           req.query = {}
         }
 

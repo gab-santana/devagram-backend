@@ -7,7 +7,6 @@ import { UsuarioModel } from "../../models/UsuarioModel";
 const pesquisaEndpoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any[]>) => {
   try {
     if (req.method === 'GET') {
-
       const { filtro } = req.query;
       if (!filtro || filtro.length < 2) {
         return res.status(400).json({ erro: 'Favor informar pelo menos 2 caracteres para a busca' });
@@ -15,7 +14,7 @@ const pesquisaEndpoint = async (req: NextApiRequest, res: NextApiResponse<Respos
 
       const usuariosEncontrados = await UsuarioModel.find({
         $or: [{ nome: { $regex: filtro, $options: 'i' } },
-          //{ email : {$regex : filtro, $options: 'i'}}
+        //{ email: { $regex: filtro, $options: 'i' } }
         ]
       });
 
