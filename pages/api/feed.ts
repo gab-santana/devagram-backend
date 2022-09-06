@@ -23,11 +23,9 @@ const feedEndpoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPa
     }
     return res.status(405).json({ erro: 'Metodo informado não é válido' })
   } catch (e) {
-    return res.status(400).json({ erro: 'Não foi possivel obter o feed' })
-
+    console.log(e)
   }
-
-
+  return res.status(400).json({ erro: 'Não foi possivel obter o feed' })
 }
 
 
