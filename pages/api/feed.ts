@@ -1,9 +1,10 @@
-import { NextApiResponse, NextApiRequest } from "next";
-import type { RespostaPadraoMsg } from "../../types/RespostaPadraoMsg";
-import { validarTokenJWT } from "../../middlewares/validarTokenJWT";
-import { connectMongoDB } from "../../middlewares/connectMongoDB";
-import { PublicacaoModel } from "../../models/PublicacaoModel";
-import { UsuarioModel } from "../../models/UsuarioModel";
+import { NextApiResponse, NextApiRequest } from "next"
+import type { RespostaPadraoMsg } from "../../types/RespostaPadraoMsg"
+import { validarTokenJWT } from "../../middlewares/validarTokenJWT"
+import { connectMongoDB } from "../../middlewares/connectMongoDB"
+import { PublicacaoModel } from "../../models/PublicacaoModel"
+import { UsuarioModel } from "../../models/UsuarioModel"
+import { SeguidorModel } from "../../models/SeguidorModel"
 
 const feedEndpoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg | any>) => {
   try {
@@ -17,7 +18,41 @@ const feedEndpoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPa
         const publicacoes = await PublicacaoModel
           .find({ idUsuario: usuario._id })
           .sort({ data: -1 })
+
         return res.status(200).json(publicacoes)
+      } else {
+        const { userId } = req.query
+        const usuarioLogado = await UsuarioModel.findById(userId)
+
+        if (!usuarioLogado) {
+          return res.status(400).json({ erro: 'Usuário não encontrado' })
+        }
+
+        const seguidores = await SeguidorModel.find({ usuarioId: usuarioLogado._id })
+        const seguidoresIds = seguidores.map(s => s.usuarioSeguidoId)
+
+        const publicacoes = await PublicacaoModel.find({
+          $or: [
+            { idUsuario: usuarioLogado._id },
+            { idUsuario: seguidoresIds }
+          ]
+        })
+          .sort({ data: -1 })
+
+        const result = []
+        for (const publicacao of publicacoes) {
+          const usuarioPublicacao = await UsuarioModel.findById(publicacao.idUsuario)
+          if (usuarioPublicacao) {
+            const final = {
+              ...publicacao._doc, usuario: {
+                nome: usuarioPublicacao.nome,
+                avatar: usuarioPublicacao.avatar
+              }
+            }
+            result.push(final)
+          }
+        }
+        return res.status(200).json(result)
       }
 
     }
