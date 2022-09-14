@@ -5,6 +5,7 @@ import { LoginResposta } from "../../types/LoginResposta";
 import md5 from "md5";
 import { UsuarioModel } from "../../models/UsuarioModel";
 import jwt from 'jsonwebtoken';
+import { politicaCors } from "../../middlewares/politicaCors";
 
 const endpointLogin = async (
   req: NextApiRequest,
@@ -37,4 +38,4 @@ const endpointLogin = async (
   return res.status(405).json({ erro: 'Method not allowed' })
 }
 
-export default connectMongoDB(endpointLogin)
+export default politicaCors(connectMongoDB(endpointLogin))

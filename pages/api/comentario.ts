@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { connectMongoDB } from "../../middlewares/connectMongoDB";
+import { politicaCors } from "../../middlewares/politicaCors";
 import { validarTokenJWT } from "../../middlewares/validarTokenJWT";
 import { PublicacaoModel } from "../../models/PublicacaoModel";
 import { UsuarioModel } from "../../models/UsuarioModel";
@@ -29,7 +30,7 @@ const comentarioEndPoint = async (req: NextApiRequest, res: NextApiResponse<Resp
         comentario: req.body.comentario
       }
       publicacao.comentarios.push(comentario)
-      
+
       await PublicacaoModel.findByIdAndUpdate({ _id: publicacao._id }, publicacao)
       return res.status(200).json({ msg: 'Comentário adicionado com sucesso' })
 
@@ -41,4 +42,4 @@ const comentarioEndPoint = async (req: NextApiRequest, res: NextApiResponse<Resp
   }
 }
 
-export default validarTokenJWT(connectMongoDB(comentarioEndPoint))
+export default politicaCors(validarTokenJWT(connectMongoDB(comentarioEndPoint)))
